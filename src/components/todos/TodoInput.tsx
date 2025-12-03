@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { Box, TextField, TableRow, TableCell, Typography } from "@mui/material";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import Image from "next/image";
+import { TodoDateCell } from "./TodoDateCell";
 
 interface TodoInputProps {
-  onSave: (title: string) => void;
+  onSave: (title: string, dueDate?: string) => void;
   onCancel: () => void;
 }
 
@@ -22,8 +22,8 @@ const formatDate = (date: Date) => {
 
 export const TodoInput: React.FC<TodoInputProps> = ({ onSave, onCancel }) => {
   const [title, setTitle] = useState("");
+  const [dueDate, setDueDate] = useState<string | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement>(null);
-  // Use current time for display, similar to design
   const [createdAt] = useState(new Date());
 
   useEffect(() => {
@@ -31,12 +31,16 @@ export const TodoInput: React.FC<TodoInputProps> = ({ onSave, onCancel }) => {
       inputRef.current.focus();
     }
   }, []);
+  const handleSave = (title: string, dueDate?: string) => {
+    onSave(title, dueDate);
+    setTitle("");
+    setDueDate(undefined);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       if (title.trim()) {
-        onSave(title);
-        setTitle("");
+        handleSave(title, dueDate);
       } else {
         onCancel();
       }
@@ -45,8 +49,12 @@ export const TodoInput: React.FC<TodoInputProps> = ({ onSave, onCancel }) => {
     }
   };
 
-  const handleBlur = () => {
-    onCancel();
+  const handleBlur = (e: React.FocusEvent) => {
+    if (title.trim()) {
+      handleSave(title, dueDate);
+    } else {
+      onCancel();
+    }
   };
 
   return (
@@ -83,18 +91,12 @@ export const TodoInput: React.FC<TodoInputProps> = ({ onSave, onCancel }) => {
         />
       </TableCell>
 
-      {/* 3. Due Date Column - Placeholder Icon */}
-      <TableCell>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            color: "text.secondary",
-          }}
-        >
-          <CalendarTodayIcon fontSize="small" sx={{ fontSize: 18 }} />
-        </Box>
-      </TableCell>
+      {/* 3. Due Date Column */}
+      <TodoDateCell
+        date={dueDate}
+        onDateChange={setDueDate}
+        showIconOnEmpty={true}
+      />
 
       {/* 4. Created At Column - Current Time */}
       <TableCell>

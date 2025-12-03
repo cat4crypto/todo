@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import {
-  Box,
   Typography,
   Checkbox,
   TextField,
@@ -11,8 +10,8 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Todo } from "@/lib/types";
-//import checked svg
 import Image from "next/image";
+import { TodoDateCell } from "./TodoDateCell";
 
 interface TodoItemProps {
   todo: Todo;
@@ -31,12 +30,7 @@ const formatDate = (dateString?: string) => {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-  }).format(date); // e.g. 09/05/2025 14:00
-};
-
-const isOverdue = (dateString?: string) => {
-  if (!dateString) return false;
-  return new Date(dateString) < new Date();
+  }).format(date);
 };
 
 export const TodoItem: React.FC<TodoItemProps> = ({
@@ -80,9 +74,6 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       setIsEditingTitle(false);
     }
   };
-
-  // Due Date handling (simplified for now, click logic for date picker would go here)
-  const overdue = !todo.completed && isOverdue(todo.dueDate);
 
   return (
     <TableRow
@@ -147,17 +138,11 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       </TableCell>
 
       {/* Due Date */}
-      <TableCell>
-        {/* Date Picker trigger would be here */}
-        <Typography
-          variant="body2"
-          sx={{
-            color: overdue ? "error.main" : "text.secondary",
-          }}
-        >
-          {formatDate(todo.dueDate)}
-        </Typography>
-      </TableCell>
+      <TodoDateCell
+        date={todo.dueDate}
+        onDateChange={(newDate) => onUpdate(todo.id, { dueDate: newDate })}
+        disabled={todo.completed}
+      />
 
       <TableCell>
         <Typography variant="body2" color="text.secondary">

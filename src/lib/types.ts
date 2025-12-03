@@ -6,8 +6,8 @@ export interface Todo {
   updatedAt: string;
   order?: number;
   dueDate?: string;
-  notes?: string;
-  tags?: string[];
+  notes?: string; //设计稿中没有用到这个字段
+  tags?: string[]; //设计稿中没有用到这个字段
 }
 
 export type ApiSuccess<T> = {

@@ -22,7 +22,7 @@ import { TodoInput } from "./TodoInput";
 
 interface TodoListProps {
   todos: Todo[];
-  onAdd: (title: string) => void;
+  onAdd: (title: string, dueDate?: string) => void;
   onToggle: (id: string) => void;
   onUpdate: (id: string, data: Partial<Todo>) => void;
   onDelete?: (id: string) => void;
@@ -59,26 +59,25 @@ export const TodoList: React.FC<TodoListProps> = ({
       </Typography>
 
       {/* Toolbar */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            size="small"
-            sx={{ textTransform: "none" }}
-            onClick={handleAddNew}
-          >
-            New Task
-          </Button>
+      <Stack direction="row" spacing={1} alignItems="center">
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          size="small"
+          sx={{ textTransform: "none" }}
+          onClick={handleAddNew}
+        >
+          New Task
+        </Button>
 
-          <TodoFilterMenu
-            currentFilter={filter}
-            onFilterChange={onFilterChange}
-          />
+        <TodoFilterMenu
+          currentFilter={filter}
+          onFilterChange={onFilterChange}
+        />
 
-          <TodoSortMenu currentSort={sort} onSortChange={onSortChange} />
-        </Stack>
-      </Box>
+        <TodoSortMenu currentSort={sort} onSortChange={onSortChange} />
+      </Stack>
+      {/* </Box> */}
 
       <TableContainer
         component={Paper}
@@ -119,8 +118,8 @@ export const TodoList: React.FC<TodoListProps> = ({
             )}
             {isAdding && (
               <TodoInput
-                onSave={(title) => {
-                  onAdd(title);
+                onSave={(title, dueDate) => {
+                  onAdd(title, dueDate);
                   setIsAdding(false);
                 }}
                 onCancel={() => setIsAdding(false)}

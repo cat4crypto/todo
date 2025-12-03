@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import { IconButton, Menu, MenuItem } from "@mui/material";
-import SwapVertIcon from "@mui/icons-material/SwapVert";
+import { Menu, MenuItem } from "@mui/material";
+import { CustomIconButton } from "@/components/common/CustomIconButton";
 
 export type SortType = "dueDate" | "createdAt" | "title" | "order";
 
@@ -34,10 +34,11 @@ export const TodoSortMenu: React.FC<TodoSortMenuProps> = ({
 
   return (
     <>
-      <IconButton size="small" onClick={handleClick}>
-        <SwapVertIcon fontSize="small" />
-      </IconButton>
-
+      <CustomIconButton
+        onClick={handleClick}
+        src="/icons/sorter.svg"
+        active={Boolean(anchorEl)}
+      />
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         {SORT_OPTIONS.map((option) => (
           <MenuItem
