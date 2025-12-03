@@ -1,14 +1,14 @@
-import { Todo } from './types';
-import cuid from 'cuid';
-import fs from 'fs';
-import path from 'path';
+import { Todo } from "./types";
+import cuid from "cuid";
+import fs from "fs";
+import path from "path";
 
 class TodoStore {
   private todos: Todo[] = [];
   private initialized = false;
   private enablePersistence = false;
-  private dataPath = path.join(process.cwd(), 'data', 'todos.json');
-  private seedPath = path.join(process.cwd(), 'data', 'todos.seed.json');
+  private dataPath = path.join(process.cwd(), "data", "todos.json");
+  private seedPath = path.join(process.cwd(), "data", "todos.seed.json");
 
   constructor() {
     this.initialize();
@@ -23,13 +23,14 @@ class TodoStore {
   private loadSeedData() {
     try {
       if (fs.existsSync(this.seedPath)) {
-        const seedData = fs.readFileSync(this.seedPath, 'utf-8');
+        const seedData = fs.readFileSync(this.seedPath, "utf-8");
         this.todos = JSON.parse(seedData);
+        console.log({ thisTodos: this.todos });
       } else {
         this.todos = this.getDefaultSeedData();
       }
     } catch (error) {
-      console.error('Error loading seed data:', error);
+      console.error("Error loading seed data:", error);
       this.todos = this.getDefaultSeedData();
     }
   }
@@ -39,72 +40,72 @@ class TodoStore {
     return [
       {
         id: cuid(),
-        title: 'Setup development environment',
+        title: "Setup development environment",
         completed: true,
         createdAt: now,
         updatedAt: now,
         order: 1,
-        notes: 'Install Node.js, npm, and setup the project',
-        tags: ['setup', 'dev'],
+        notes: "Install Node.js, npm, and setup the project",
+        tags: ["setup", "dev"],
       },
       {
         id: cuid(),
-        title: 'Create API documentation',
+        title: "Create API documentation",
         completed: false,
         createdAt: now,
         updatedAt: now,
         order: 2,
-        notes: 'Document all API endpoints with examples',
-        tags: ['documentation'],
+        notes: "Document all API endpoints with examples",
+        tags: ["documentation"],
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
         id: cuid(),
-        title: 'Implement authentication',
+        title: "Implement authentication",
         completed: false,
         createdAt: now,
         updatedAt: now,
         order: 3,
-        tags: ['feature', 'security'],
+        tags: ["feature", "security"],
       },
       {
         id: cuid(),
-        title: 'Write unit tests',
+        title: "Write unit tests",
         completed: false,
         createdAt: now,
         updatedAt: now,
         order: 4,
-        notes: 'Cover all API endpoints with tests',
-        tags: ['testing'],
+        notes: "Cover all API endpoints with tests",
+        tags: ["testing"],
         dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
         id: cuid(),
-        title: 'Setup CI/CD pipeline',
+        title: "Setup CI/CD pipeline",
         completed: false,
         createdAt: now,
         updatedAt: now,
         order: 5,
-        tags: ['devops', 'automation'],
+        tags: ["devops", "automation"],
       },
       {
         id: cuid(),
-        title: 'Optimize database queries',
+        title: "Optimize database queries",
         completed: true,
         createdAt: now,
         updatedAt: now,
         order: 6,
-        notes: 'Review and optimize slow queries',
-        tags: ['performance', 'database'],
+        notes: "Review and optimize slow queries",
+        tags: ["performance", "database"],
       },
       {
         id: cuid(),
-        title: 'Add rate limiting',
+        title: "Add rate limiting",
         completed: false,
         createdAt: now,
         updatedAt: now,
         order: 7,
-        tags: ['security', 'feature'],
+        tags: ["security", "feature"],
         dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
       },
     ];
@@ -117,7 +118,7 @@ class TodoStore {
       fs.mkdirSync(path.dirname(this.dataPath), { recursive: true });
       fs.writeFileSync(this.dataPath, JSON.stringify(this.todos, null, 2));
     } catch (error) {
-      console.error('Error persisting data:', error);
+      console.error("Error persisting data:", error);
     }
   }
 
@@ -129,7 +130,9 @@ class TodoStore {
     return this.todos.find((todo) => todo.id === id);
   }
 
-  createTodo(data: Omit<Todo, 'id' | 'createdAt' | 'updatedAt' | 'completed'>): Todo {
+  createTodo(
+    data: Omit<Todo, "id" | "createdAt" | "updatedAt" | "completed">
+  ): Todo {
     const now = new Date().toISOString();
     const newTodo: Todo = {
       ...data,
@@ -144,7 +147,10 @@ class TodoStore {
     return newTodo;
   }
 
-  updateTodo(id: string, data: Partial<Omit<Todo, 'id' | 'createdAt'>>): Todo | undefined {
+  updateTodo(
+    id: string,
+    data: Partial<Omit<Todo, "id" | "createdAt">>
+  ): Todo | undefined {
     const todoIndex = this.todos.findIndex((todo) => todo.id === id);
     if (todoIndex === -1) return undefined;
 
@@ -161,6 +167,9 @@ class TodoStore {
 
   deleteTodo(id: string): boolean {
     const initialLength = this.todos.length;
+    console.log({ id });
+    const existTodo = this.todos.find((todo) => todo.id === id);
+    console.log({ existTodo });
     this.todos = this.todos.filter((todo) => todo.id !== id);
     this.persistData();
     return this.todos.length < initialLength;
@@ -211,4 +220,8 @@ class TodoStore {
   }
 }
 
-export const todoStore = new TodoStore();
+// export const todoStore = new TodoStore();
+const globalForTodoStore = global as unknown as { todoStore: TodoStore };
+export const todoStore = globalForTodoStore.todoStore || new TodoStore();
+if (process.env.NODE_ENV !== "production")
+  globalForTodoStore.todoStore = todoStore;

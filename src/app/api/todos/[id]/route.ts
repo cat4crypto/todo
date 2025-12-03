@@ -138,6 +138,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
  */
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    await new Promise(resolve => setTimeout(resolve, 4000)); //TODO: Remove this
     const { id } = await params;
     const body = await request.json();
     const validationResult = updateTodoSchema.safeParse(body);
@@ -207,6 +208,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    await new Promise(resolve => setTimeout(resolve, 4000)); //TODO: Remove this
     const { id } = await params;
     const deleted = todoStore.deleteTodo(id);
 

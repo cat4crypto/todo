@@ -1,95 +1,160 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import React, { useState } from 'react';
+import { Box } from '@mui/material';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { TodoList } from '@/components/todos/TodoList';
+import { Todo } from '@/lib/types';
+import { api, TodoFilter, TodoSort } from '@/lib/api';
+import toast from 'react-hot-toast';
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const queryClient = useQueryClient();
+  
+  // State for filtering and sorting
+  const [filter, setFilter] = useState<TodoFilter>('all');
+  const [sort, setSort] = useState<TodoSort>('createdAt');
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  const { data: todos = [] } = useQuery({
+    queryKey: ['todos', filter, sort],
+    queryFn: () => api.getTodos({ status: filter, sortBy: sort }),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: api.createTodo,
+    onMutate: async (title: string) => {
+      await queryClient.cancelQueries({ queryKey: ['todos', filter, sort] });
+      const previousTodos = queryClient.getQueryData<Todo[]>(['todos', filter, sort]);
+
+      if (previousTodos) {
+        const newTodo: Todo = {
+          id: `temp-${Date.now()}`,
+          title,
+          completed: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        // Only optimistically update if the current filter shows active tasks
+        if (filter !== 'completed') {
+          queryClient.setQueryData<Todo[]>(['todos', filter, sort], (old) => [
+            newTodo,
+            ...(old || []),
+          ]);
+        }
+      }
+      return { previousTodos };
+    },
+    onSuccess: () => {
+      // Invalidate queries to refetch with correct sort/filter
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
+      toast.success('Task created successfully');
+    },
+    onError: (error, _, context) => {
+      if (context?.previousTodos) {
+        queryClient.setQueryData(['todos', filter, sort], context.previousTodos);
+      }
+      toast.error(`Failed to create task: ${error.message}`);
+    }
+  });
+
+  // Toggle/Update mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Todo> }) => api.updateTodo(id, data),
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ['todos', filter, sort] });
+      const previousTodos = queryClient.getQueryData<Todo[]>(['todos', filter, sort]);
+
+      if (previousTodos) {
+        queryClient.setQueryData<Todo[]>(['todos', filter, sort], (old) => {
+          if (!old) return [];
+
+          // Handle filtering logic for optimistic updates
+          if (data.completed !== undefined) {
+             // If we are in 'active' view and marking as completed -> remove
+             if (filter === 'active' && data.completed) {
+               return old.filter(t => t.id !== id);
+             }
+             // If we are in 'completed' view and marking as active -> remove
+             if (filter === 'completed' && !data.completed) {
+               return old.filter(t => t.id !== id);
+             }
+          }
+
+          return old.map((t) => (t.id === id ? { ...t, ...data } : t));
+
+        });
+      }
+      return { previousTodos };
+    },
+    onSuccess: (_, variables) => {
+       if (variables.data.completed !== undefined) {
+          toast.success(variables.data.completed ? 'Task completed' : 'Task active');
+       } else {
+          toast.success('Task updated successfully');
+       }
+    },
+    onError: (err, newTodo, context) => {
+      if (context?.previousTodos) {
+        queryClient.setQueryData(['todos', filter, sort], context.previousTodos);
+      }
+      toast.error(`Failed to update task: ${err.message}`);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
+    },
+  });
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: api.deleteTodo,
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['todos', filter, sort] });
+      const previousTodos = queryClient.getQueryData<Todo[]>(['todos', filter, sort]);
+
+      if (previousTodos) {
+        queryClient.setQueryData<Todo[]>(['todos', filter, sort], (old) =>
+          old?.filter((t) => t.id !== id)
+        );
+      }
+      return { previousTodos };
+    },
+    onSuccess: () => {
+      toast.success('Task deleted successfully');
+    },
+    onError: (err, id, context) => {
+      if (context?.previousTodos) {
+        queryClient.setQueryData(['todos', filter, sort], context.previousTodos);
+      }
+      toast.error(`Failed to delete task: ${err.message}`);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
+    },
+  });
+
+  const handleAdd = (title: string) => createMutation.mutate(title);
+  const handleToggle = (id: string) => {
+    const todo = todos.find((t) => t.id === id);
+    if (todo) updateMutation.mutate({ id, data: { completed: !todo.completed } });
+  };
+  const handleUpdate = (id: string, data: Partial<Todo>) => updateMutation.mutate({ id, data });
+  const handleDelete = (id: string) => deleteMutation.mutate(id);
+
+  return (
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', py: 4 }}>
+      <TodoList 
+        todos={todos}
+        onAdd={handleAdd}
+        onToggle={handleToggle}
+        onUpdate={handleUpdate}
+        onDelete={handleDelete}
+        filter={filter}
+        onFilterChange={setFilter}
+        sort={sort}
+        onSortChange={setSort}
+      />
+    </Box>
   );
 }
+

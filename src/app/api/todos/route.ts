@@ -102,6 +102,8 @@ export async function GET(request: NextRequest) {
         case 'updatedAt':
           compareValue = a[sortBy].localeCompare(b[sortBy]);
           break;
+        // case 'taskID':
+        //   break;
       }
 
       return sortDir === 'desc' ? -compareValue : compareValue;
@@ -154,6 +156,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    await new Promise(resolve => setTimeout(resolve, 4000)); //TODO: Remove this
     const body = await request.json();
     const validationResult = createTodoSchema.safeParse(body);
 
