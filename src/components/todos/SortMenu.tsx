@@ -1,24 +1,23 @@
 "use client";
 import React from "react";
-import { Menu, MenuItem } from "@mui/material";
+import { Menu } from "@mui/material";
 import { CustomIconButton } from "@/components/common/CustomIconButton";
+import { CustomMenuItem } from "@/components/common/CustomMenuItem";
 
 export type SortType = "dueDate" | "createdAt" | "title" | "order";
 
-interface TodoSortMenuProps {
+interface SortMenuProps {
   currentSort: SortType;
   onSortChange: (sort: SortType) => void;
 }
 
 const SORT_OPTIONS: { value: SortType; label: string }[] = [
+  { value: "createdAt", label: "Created At" },
   { value: "dueDate", label: "Due Date" },
-  { value: "createdAt", label: "Created Date" },
   { value: "order", label: "Manual Order" },
-  //TaskID
-  // { value: "taskID", label: "Task ID" },
 ];
 
-export const TodoSortMenu: React.FC<TodoSortMenuProps> = ({
+export const SortMenu: React.FC<SortMenuProps> = ({
   currentSort,
   onSortChange,
 }) => {
@@ -39,18 +38,30 @@ export const TodoSortMenu: React.FC<TodoSortMenuProps> = ({
         src="/icons/sorter.svg"
         active={Boolean(anchorEl)}
       />
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        slotProps={{
+          paper: {
+            sx: {
+              minWidth: 152,
+              py: 1,
+              bgcolor: "background.paper",
+            },
+          },
+        }}
+      >
         {SORT_OPTIONS.map((option) => (
-          <MenuItem
+          <CustomMenuItem
             key={option.value}
+            label={option.label}
+            selected={currentSort === option.value}
             onClick={() => {
               onSortChange(option.value);
               handleClose();
             }}
-            selected={currentSort === option.value}
-          >
-            {option.label}
-          </MenuItem>
+          />
         ))}
       </Menu>
     </>

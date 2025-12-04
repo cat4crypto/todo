@@ -11,7 +11,6 @@ import toast from 'react-hot-toast';
 export default function Home() {
   const queryClient = useQueryClient();
   
-  // State for filtering and sorting
   const [filter, setFilter] = useState<TodoFilter>('all');
   const [sort, setSort] = useState<TodoSort>('createdAt');
 
@@ -21,8 +20,9 @@ export default function Home() {
   });
 
   const createMutation = useMutation({
-    mutationFn: api.createTodo,
-    onMutate: async (title: string) => {
+    mutationFn: ({ title, dueDate }: { title: string; dueDate?: string }) =>
+      api.createTodo(title, dueDate),
+    onMutate: async ({ title, dueDate }) => {
       await queryClient.cancelQueries({ queryKey: ['todos', filter, sort] });
       const previousTodos = queryClient.getQueryData<Todo[]>(['todos', filter, sort]);
 
@@ -33,9 +33,9 @@ export default function Home() {
           completed: false,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          ...(dueDate && { dueDate }),
         };
 
-        // Only optimistically update if the current filter shows active tasks
         if (filter !== 'completed') {
           queryClient.setQueryData<Todo[]>(['todos', filter, sort], (old) => [
             newTodo,
@@ -46,7 +46,6 @@ export default function Home() {
       return { previousTodos };
     },
     onSuccess: () => {
-      // Invalidate queries to refetch with correct sort/filter
       queryClient.invalidateQueries({ queryKey: ['todos'] });
       toast.success('Task created successfully');
     },
@@ -58,7 +57,6 @@ export default function Home() {
     }
   });
 
-  // Toggle/Update mutation
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Todo> }) => api.updateTodo(id, data),
     onMutate: async ({ id, data }) => {
@@ -69,13 +67,10 @@ export default function Home() {
         queryClient.setQueryData<Todo[]>(['todos', filter, sort], (old) => {
           if (!old) return [];
 
-          // Handle filtering logic for optimistic updates
           if (data.completed !== undefined) {
-             // If we are in 'active' view and marking as completed -> remove
              if (filter === 'active' && data.completed) {
                return old.filter(t => t.id !== id);
              }
-             // If we are in 'completed' view and marking as active -> remove
              if (filter === 'completed' && !data.completed) {
                return old.filter(t => t.id !== id);
              }
@@ -133,7 +128,8 @@ export default function Home() {
     },
   });
 
-  const handleAdd = (title: string) => createMutation.mutate(title);
+  const handleAdd = (title: string, dueDate?: string) =>
+    createMutation.mutate({ title, dueDate });
   const handleToggle = (id: string) => {
     const todo = todos.find((t) => t.id === id);
     if (todo) updateMutation.mutate({ id, data: { completed: !todo.completed } });

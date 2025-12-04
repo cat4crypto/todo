@@ -1,7 +1,9 @@
 "use client";
 import React from "react";
-import { Menu, MenuItem } from "@mui/material";
+import { Menu } from "@mui/material";
 import { CustomIconButton } from "@/components/common/CustomIconButton";
+import { CustomMenuItem } from "@/components/common/CustomMenuItem";
+
 export type FilterType = "all" | "active" | "completed";
 
 interface TodoFilterMenuProps {
@@ -15,7 +17,7 @@ const FILTER_OPTIONS: { value: FilterType; label: string }[] = [
   { value: "completed", label: "已完成" },
 ];
 
-export const TodoFilterMenu: React.FC<TodoFilterMenuProps> = ({
+export const FilterMenu: React.FC<TodoFilterMenuProps> = ({
   currentFilter,
   onFilterChange,
 }) => {
@@ -37,18 +39,30 @@ export const TodoFilterMenu: React.FC<TodoFilterMenuProps> = ({
         active={Boolean(anchorEl)}
       />
 
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        slotProps={{
+          paper: {
+            sx: {
+              minWidth: 152,
+              py: 1,
+              bgcolor: "background.paper",
+            },
+          },
+        }}
+      >
         {FILTER_OPTIONS.map((option) => (
-          <MenuItem
+          <CustomMenuItem
             key={option.value}
+            label={option.label}
+            selected={currentFilter === option.value}
             onClick={() => {
               onFilterChange(option.value);
               handleClose();
             }}
-            selected={currentFilter === option.value}
-          >
-            {option.label}
-          </MenuItem>
+          />
         ))}
       </Menu>
     </>

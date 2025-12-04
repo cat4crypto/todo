@@ -16,9 +16,11 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import { Todo } from "@/lib/types";
 import { TodoItem } from "./TodoItem";
-import { TodoFilterMenu, FilterType } from "./TodoFilterMenu";
-import { TodoSortMenu, SortType } from "./TodoSortMenu";
-import { TodoInput } from "./TodoInput";
+import { FilterMenu, FilterType } from "./FilterMenu";
+import { SortMenu, SortType } from "./SortMenu";
+import { AddingRow } from "./AddingRow";
+import { ColumnHeader } from "./ColumnHeader";
+import Image from "next/image";
 
 interface TodoListProps {
   todos: Todo[];
@@ -45,39 +47,40 @@ export const TodoList: React.FC<TodoListProps> = ({
 }) => {
   const [isAdding, setIsAdding] = useState(false);
 
-  // No local filtering/sorting logic anymore!
-  // We render what is passed in props.
-
   const handleAddNew = () => {
     setIsAdding(true);
   };
 
   return (
     <Box sx={{ width: "100%", maxWidth: 1000, margin: "0 auto", p: 2 }}>
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: "bold" }}>
+      <Typography variant="h1" sx={{ mb: 3 }}>
         Tasks
       </Typography>
 
-      {/* Toolbar */}
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={2} alignItems="center">
         <Button
-          variant="contained"
-          startIcon={<AddIcon />}
+          variant="outlined"
+          startIcon={
+            <Image src={"/icons/plus.svg"} alt="add" width={12} height={12} />
+          }
           size="small"
-          sx={{ textTransform: "none" }}
           onClick={handleAddNew}
+          sx={{
+            color: "text.primary",
+            borderColor: "grey.500",
+            "&:hover": {
+              borderColor: "text.primary",
+            },
+          }}
         >
           New Task
         </Button>
 
-        <TodoFilterMenu
-          currentFilter={filter}
-          onFilterChange={onFilterChange}
-        />
-
-        <TodoSortMenu currentSort={sort} onSortChange={onSortChange} />
+        <Stack spacing={1} direction="row" alignItems="center">
+          <FilterMenu currentFilter={filter} onFilterChange={onFilterChange} />
+          <SortMenu currentSort={sort} onSortChange={onSortChange} />
+        </Stack>
       </Stack>
-      {/* </Box> */}
 
       <TableContainer
         component={Paper}
@@ -87,37 +90,32 @@ export const TodoList: React.FC<TodoListProps> = ({
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox" />
-              <TableCell>Task Title</TableCell>
-              <TableCell>Due Date</TableCell>
-              <TableCell>Created at</TableCell>
-              <TableCell>Task ID</TableCell>
+              <TableCell>
+                <ColumnHeader label="Task Title" icon="/icons/text.svg" />
+              </TableCell>
+              <TableCell>
+                <ColumnHeader label="Due Date" icon="/icons/calendar.svg" />
+              </TableCell>
+              <TableCell>
+                <ColumnHeader label="Created at" icon="/icons/calendar-1.svg" />
+              </TableCell>
+              <TableCell>
+                <ColumnHeader label="Task ID" icon="/icons/link.svg" />
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {todos.length === 0 && !isAdding ? (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  align="center"
-                  sx={{ py: 4, color: "text.secondary" }}
-                >
-                  No tasks found
-                </TableCell>
-              </TableRow>
-            ) : (
-              todos.map((todo) => (
-                <TodoItem
-                  key={todo.id}
-                  todo={todo}
-                  onToggle={onToggle}
-                  onUpdate={onUpdate}
-                  onDelete={onDelete}
-                />
-              ))
-            )}
+            {todos.map((todo) => (
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                onToggle={onToggle}
+                onUpdate={onUpdate}
+                onDelete={onDelete}
+              />
+            ))}
             {isAdding && (
-              <TodoInput
+              <AddingRow
                 onSave={(title, dueDate) => {
                   onAdd(title, dueDate);
                   setIsAdding(false);
@@ -130,18 +128,17 @@ export const TodoList: React.FC<TodoListProps> = ({
       </TableContainer>
 
       {!isAdding && (
-        <Box sx={{ mt: 2 }}>
-          <Box
-            onClick={handleAddNew}
-            sx={{
-              p: 2,
-              cursor: "pointer",
-              color: "text.secondary",
-              "&:hover": { color: "text.primary" },
-            }}
-          >
-            + New Task
-          </Box>
+        <Box
+          onClick={handleAddNew}
+          sx={{
+            p: 2,
+            pl: 6,
+            cursor: "pointer",
+            color: "text.secondary",
+            "&:hover": { color: "text.primary" },
+          }}
+        >
+          New Task
         </Box>
       )}
     </Box>

@@ -9,9 +9,10 @@ import {
   IconButton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Box from "@mui/material/Box";
 import { Todo } from "@/lib/types";
 import Image from "next/image";
-import { TodoDateCell } from "./TodoDateCell";
+import { DateTimeCell } from "./DateTimeCell";
 
 interface TodoItemProps {
   todo: Todo;
@@ -81,67 +82,65 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <TableCell padding="checkbox">
-        <Checkbox
-          checked={todo.completed}
-          onChange={() => onToggle(todo.id)}
-          checkedIcon={
-            <Image
-              src="/icons/checked.svg"
-              alt="checked"
-              width={16}
-              height={16}
-            />
-          }
-          icon={
-            <Image
-              src="/icons/active.svg"
-              alt="unchecked"
-              width={16}
-              height={16}
-            />
-          }
-          color="primary"
-          sx={{
-            "&.Mui-checked": {
-              color: "primary.main",
-            },
-          }}
-        />
-      </TableCell>
-
-      <TableCell sx={{ width: "40%" }}>
-        {isEditingTitle ? (
-          <TextField
-            fullWidth
-            variant="standard"
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            onBlur={handleTitleSave}
-            onKeyDown={handleKeyDown}
-            inputRef={inputRef}
-            InputProps={{ disableUnderline: true }}
-          />
-        ) : (
-          <Typography
-            variant="body1"
-            onClick={handleTitleClick}
+      <TableCell>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Checkbox
+            checked={todo.completed}
+            onChange={() => onToggle(todo.id)}
+            checkedIcon={
+              <Image
+                src="/icons/checked.svg"
+                alt="checked"
+                width={16}
+                height={16}
+              />
+            }
+            icon={
+              <Image
+                src="/icons/active.svg"
+                alt="unchecked"
+                width={16}
+                height={16}
+              />
+            }
+            color="primary"
             sx={{
-              cursor: "pointer",
-              textDecoration: todo.completed ? "line-through" : "none",
-              color: todo.completed ? "text.secondary" : "text.primary",
+              "&.Mui-checked": {
+                color: "primary.main",
+              },
             }}
-          >
-            {todo.title}
-          </Typography>
-        )}
+          />
+          {isEditingTitle ? (
+            <TextField
+              fullWidth
+              variant="standard"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              onBlur={handleTitleSave}
+              onKeyDown={handleKeyDown}
+              inputRef={inputRef}
+              InputProps={{ disableUnderline: true }}
+            />
+          ) : (
+            <Typography
+              variant="body1"
+              onClick={handleTitleClick}
+              sx={{
+                cursor: "pointer",
+                textDecoration: todo.completed ? "line-through" : "none",
+                color: todo.completed ? "text.secondary" : "text.primary",
+              }}
+            >
+              {todo.title}
+            </Typography>
+          )}
+        </Box>
       </TableCell>
 
       {/* Due Date */}
-      <TodoDateCell
+      <DateTimeCell
         date={todo.dueDate}
         onDateChange={(newDate) => onUpdate(todo.id, { dueDate: newDate })}
-        disabled={todo.completed}
       />
 
       <TableCell>

@@ -156,7 +156,6 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    await new Promise(resolve => setTimeout(resolve, 4000)); //TODO: Remove this
     const body = await request.json();
     const validationResult = createTodoSchema.safeParse(body);
 

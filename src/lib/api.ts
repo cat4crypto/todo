@@ -41,11 +41,11 @@ export const api = {
   },
 
   // Create a new todo
-  createTodo: (title: string) =>
+  createTodo: (title: string, dueDate?: string) =>
     fetcher<Todo>("/todos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title }),
+      body: JSON.stringify({ title, ...(dueDate && { dueDate }) }),
     }),
 
   // Update a todo

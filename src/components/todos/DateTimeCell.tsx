@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { TableCell, Box, Typography } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import { TodoDatePicker } from "./TodoDatePicker";
+import { DateTimePicker } from "./DatePicker";
 
-interface TodoDateCellProps {
+interface DateTimeCellProps {
   date?: string;
   onDateChange: (newDate: string) => void;
-  disabled?: boolean;
-  showIconOnEmpty?: boolean; // If true, show calendar icon when no date is set
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
 const formatDate = (dateString?: string) => {
@@ -28,21 +27,22 @@ const isOverdue = (dateString?: string) => {
   return new Date(dateString) < new Date();
 };
 
-export const TodoDateCell: React.FC<TodoDateCellProps> = ({
+export const DateTimeCell: React.FC<DateTimeCellProps> = ({
   date,
   onDateChange,
-  disabled = false,
-  showIconOnEmpty = false,
+  onOpenChange,
 }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    if (disabled) return;
     setAnchorEl(event.currentTarget);
+    onOpenChange?.(true);
+    console.log("handleClick invoked");
   };
 
   const handleClose = () => {
+    console.log("handleClose invoked");
     setAnchorEl(null);
+    onOpenChange?.(false);
   };
 
   const handleSave = (newDate: string) => {
@@ -50,47 +50,38 @@ export const TodoDateCell: React.FC<TodoDateCellProps> = ({
     handleClose();
   };
 
-  const overdue = !disabled && isOverdue(date);
+  const overdue = isOverdue(date);
   const open = Boolean(anchorEl);
+  console.log({ open });
 
   return (
-    <>
+    <TableCell>
       <Box
         onClick={handleClick}
         sx={{
-          cursor: disabled ? "default" : "pointer",
+          cursor: "pointer",
           display: "inline-flex",
           alignItems: "center",
           minHeight: "24px",
           color: overdue ? "error.main" : "text.secondary",
           "&:hover": {
-            opacity: disabled ? 1 : 0.7,
+            opacity: 0.7,
           },
         }}
       >
-        {/* 如果没有日期且由 showIconOnEmpty 控制（用于 TodoInput），则显示图标，否则显示格式化日期 */}
-        {!date && showIconOnEmpty ? (
+        {!date ? (
           <CalendarTodayIcon fontSize="small" sx={{ fontSize: 18 }} />
         ) : (
-          <Typography
-            variant="body2"
-            sx={{
-              color: "inherit",
-            }}
-          >
-            {formatDate(date)}
-          </Typography>
+          <Typography variant="body2">{formatDate(date)}</Typography>
         )}
       </Box>
-
-      <TodoDatePicker
+      <DateTimePicker
         open={open}
         anchorEl={anchorEl}
         initialDate={date}
         onClose={handleClose}
         onSave={handleSave}
       />
-    </>
+    </TableCell>
   );
 };
-
