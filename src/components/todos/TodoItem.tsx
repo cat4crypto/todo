@@ -80,14 +80,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <TableCell 
-        sx={{ 
-          width: "424px",
-          minWidth: "424px",
-          maxWidth: "424px",
-          boxSizing: "border-box",
-        }}
-      >
+      <TableCell sx={{ width: "424px" }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Checkbox
             checked={todo.completed}
@@ -153,9 +146,6 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       <TableCell
         sx={{
           width: "160px",
-          minWidth: "160px",
-          maxWidth: "160px",
-          boxSizing: "border-box",
         }}
       >
         <Typography variant="body2" color="text.secondary">
@@ -164,15 +154,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       </TableCell>
 
       {/* taskID */}
-      <TableCell 
-        sx={{ 
-          position: "relative", 
-          width: "120px",
-          minWidth: "120px",
-          maxWidth: "120px",
-          boxSizing: "border-box",
-        }}
-      >
+      <TableCell sx={{ position: "relative", width: "120px" }}>
         <Typography variant="caption" color="text.secondary">
           {todo.id.substring(0, 8)}...
         </Typography>

@@ -4,7 +4,7 @@ import Image from "next/image";
 
 interface CustomIconButtonProps extends IconButtonProps {
   active?: boolean;
-  src?: string; // Optional src for quick icon usage
+  src?: string; 
 }
 
 export const CustomIconButton: React.FC<CustomIconButtonProps> = ({
@@ -21,7 +21,6 @@ export const CustomIconButton: React.FC<CustomIconButtonProps> = ({
         height: 28,
         padding: "4px",
         borderRadius: 1,
-        // Apply background color if active
         backgroundColor: active ? "rgba(255, 255, 255, 0.08)" : "transparent",
         "&:hover": {
           backgroundColor: "rgba(255, 255, 255, 0.08)",

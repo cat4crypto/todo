@@ -55,17 +55,14 @@ export const TodoList: React.FC<TodoListProps> = ({
   return (
     <Box
       sx={{
-        width: "100%",
-        maxWidth: 1000,
-        margin: "0 auto",
+        maxWidth: '944px',
+        margin: '0 auto',
         px: 2.5,
-        // py: 1.25,
       }}
     >
       <Typography variant="h1" sx={{ my: 1.25 }}>
         Tasks
       </Typography>
-      {/* //add line */}
       <Divider></Divider>
 
       <Stack direction="row" spacing={2} alignItems="center" mt={2.5} mb={1.25}>

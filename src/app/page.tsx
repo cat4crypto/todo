@@ -156,12 +156,10 @@ export default function Home() {
   return (
     <Box
       sx={{
+        width: "100%",
         minHeight: "100vh",
         bgcolor: "background.default",
-        mt: 8,
-        "& *": {
-          outline: "1px solid red",
-        },
+        py: 4,
       }}
     >
       <TodoList

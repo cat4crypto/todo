@@ -36,7 +36,6 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
     onClose();
   };
 
-  // 如果未打开，不渲染任何内容
   if (!open) return null;
 
   return (
