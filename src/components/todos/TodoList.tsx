@@ -21,6 +21,7 @@ import { SortMenu, SortType } from "./SortMenu";
 import { AddingRow } from "./AddingRow";
 import { ColumnHeader } from "./ColumnHeader";
 import Image from "next/image";
+import Divider from "@mui/material/Divider";
 
 interface TodoListProps {
   todos: Todo[];
@@ -52,28 +53,45 @@ export const TodoList: React.FC<TodoListProps> = ({
   };
 
   return (
-    <Box sx={{ width: "100%", maxWidth: 1000, margin: "0 auto", p: 2 }}>
-      <Typography variant="h1" sx={{ mb: 3 }}>
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: 1000,
+        margin: "0 auto",
+        px: 2.5,
+        // py: 1.25,
+      }}
+    >
+      <Typography variant="h1" sx={{ my: 1.25 }}>
         Tasks
       </Typography>
+      {/* //add line */}
+      <Divider></Divider>
 
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack direction="row" spacing={2} alignItems="center" mt={2.5} mb={1.25}>
         <Button
           variant="outlined"
           startIcon={
             <Image src={"/icons/plus.svg"} alt="add" width={12} height={12} />
           }
-          size="small"
           onClick={handleAddNew}
           sx={{
             color: "text.primary",
             borderColor: "grey.500",
+            textTransform: "none",
+            px: 1,
+            py: 1 / 2,
+            gap: 1 / 4,
             "&:hover": {
               borderColor: "text.primary",
             },
+            "& .MuiButton-startIcon": {
+              marginRight: 1 / 2,
+              marginLeft: 0,
+            },
           }}
         >
-          New Task
+          <Typography variant="h4">New Task</Typography>
         </Button>
 
         <Stack spacing={1} direction="row" alignItems="center">
@@ -87,21 +105,18 @@ export const TodoList: React.FC<TodoListProps> = ({
         elevation={0}
         sx={{ bgcolor: "transparent" }}
       >
-        <Table>
+        <Table
+          sx={{
+            tableLayout: "fixed",
+            width: "904px",
+          }}
+        >
           <TableHead>
             <TableRow>
-              <TableCell>
-                <ColumnHeader label="Task Title" icon="/icons/text.svg" />
-              </TableCell>
-              <TableCell>
-                <ColumnHeader label="Due Date" icon="/icons/calendar.svg" />
-              </TableCell>
-              <TableCell>
-                <ColumnHeader label="Created at" icon="/icons/calendar-1.svg" />
-              </TableCell>
-              <TableCell>
-                <ColumnHeader label="Task ID" icon="/icons/link.svg" />
-              </TableCell>
+              <ColumnHeader label="Task Title" icon="/icons/text.svg" width="424px" />
+              <ColumnHeader label="Due Date" icon="/icons/calendar.svg" width="180px" />
+              <ColumnHeader label="Created at" icon="/icons/calendar-1.svg" width="160px" />
+              <ColumnHeader label="Task ID" icon="/icons/link.svg" width="120px" />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -132,7 +147,7 @@ export const TodoList: React.FC<TodoListProps> = ({
           onClick={handleAddNew}
           sx={{
             p: 2,
-            pl: 6,
+            pl: 5,
             cursor: "pointer",
             color: "text.secondary",
             "&:hover": { color: "text.primary" },

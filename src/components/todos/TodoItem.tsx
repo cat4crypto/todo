@@ -12,7 +12,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
 import { Todo } from "@/lib/types";
 import Image from "next/image";
-import { DateTimeCell } from "./DateTimeCell";
+import { DateTimeTableCell } from "./DateTimeCell";
 
 interface TodoItemProps {
   todo: Todo;
@@ -52,10 +52,8 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   }, [isEditingTitle]);
 
   const handleTitleClick = () => {
-    if (!todo.completed) {
-      setIsEditingTitle(true);
-      setEditTitle(todo.title);
-    }
+    setIsEditingTitle(true);
+    setEditTitle(todo.title);
   };
 
   const handleTitleSave = () => {
@@ -82,7 +80,14 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <TableCell>
+      <TableCell 
+        sx={{ 
+          width: "424px",
+          minWidth: "424px",
+          maxWidth: "424px",
+          boxSizing: "border-box",
+        }}
+      >
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Checkbox
             checked={todo.completed}
@@ -105,6 +110,8 @@ export const TodoItem: React.FC<TodoItemProps> = ({
             }
             color="primary"
             sx={{
+              p: 0,
+              pr: 1,
               "&.Mui-checked": {
                 color: "primary.main",
               },
@@ -138,19 +145,34 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       </TableCell>
 
       {/* Due Date */}
-      <DateTimeCell
+      <DateTimeTableCell
         date={todo.dueDate}
         onDateChange={(newDate) => onUpdate(todo.id, { dueDate: newDate })}
       />
 
-      <TableCell>
+      <TableCell
+        sx={{
+          width: "160px",
+          minWidth: "160px",
+          maxWidth: "160px",
+          boxSizing: "border-box",
+        }}
+      >
         <Typography variant="body2" color="text.secondary">
           {formatDate(todo.createdAt)}
         </Typography>
       </TableCell>
 
       {/* taskID */}
-      <TableCell sx={{ position: "relative" }}>
+      <TableCell 
+        sx={{ 
+          position: "relative", 
+          width: "120px",
+          minWidth: "120px",
+          maxWidth: "120px",
+          boxSizing: "border-box",
+        }}
+      >
         <Typography variant="caption" color="text.secondary">
           {todo.id.substring(0, 8)}...
         </Typography>

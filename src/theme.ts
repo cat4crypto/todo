@@ -67,6 +67,7 @@ const theme = createTheme({
         root: {
           paddingTop: "12px",
           paddingBottom: "12px",
+          borderBottom: "none",
         },
       },
     },

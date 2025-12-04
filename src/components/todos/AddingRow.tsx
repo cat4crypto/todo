@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Box, TextField, TableRow, TableCell, Typography } from "@mui/material";
 import Image from "next/image";
-import { DateTimeCell } from "./DateTimeCell";
+import { DateTimeTableCell } from "./DateTimeCell";
 
 interface TodoInputProps {
   onSave: (title: string, dueDate?: string) => void;
@@ -51,33 +51,31 @@ export const AddingRow: React.FC<TodoInputProps> = ({ onSave, onCancel }) => {
   };
 
   const handleBlur = (e: React.FocusEvent) => {
-    const relatedTarget = e.relatedTarget as HTMLElement | null;
-    console.log({
-      relatedTarget,
-    });
-
-    if (relatedTarget) {
-      const isDatePickerElement =
-        relatedTarget.closest(".MuiPopover-root") !== null ||
-        relatedTarget.closest('[role="dialog"]') !== null;
-
-      if (isDatePickerElement) {
+    setTimeout(() => {
+      console.log({ isDatePickerOpen, aa: 22, relatedTarget: e.relatedTarget });
+      const relatedTarget = e.relatedTarget as HTMLElement;
+      if (relatedTarget?.dataset?.id === "date-time-cell-icon") {
         return;
       }
-    }
 
-    if (title.trim()) {
-      handleSave(title, dueDate);
-    } else {
-      onCancel();
-    }
+      if (title.trim()) {
+        handleSave(title, dueDate);
+      } else {
+        onCancel();
+      }
+    }, 0);
   };
-
+  console.log({ isDatePickerOpen });
   return (
     <TableRow hover>
       {/* 1. Checkbox */}
 
-      <TableCell>
+      <TableCell
+        sx={{
+          pt: 0,
+          pb: 0,
+        }}
+      >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 / 2 }}>
           <Box
             sx={{
@@ -104,7 +102,11 @@ export const AddingRow: React.FC<TodoInputProps> = ({ onSave, onCancel }) => {
       </TableCell>
 
       {/* 3. Due Date  */}
-      <DateTimeCell date={dueDate} onDateChange={setDueDate} />
+      <DateTimeTableCell
+        date={dueDate}
+        onDateChange={setDueDate}
+        onOpenChange={setIsDatePickerOpen}
+      />
 
       {/* 4. Created At */}
       <TableCell>

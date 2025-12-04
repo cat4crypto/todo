@@ -27,7 +27,7 @@ const isOverdue = (dateString?: string) => {
   return new Date(dateString) < new Date();
 };
 
-export const DateTimeCell: React.FC<DateTimeCellProps> = ({
+export const DateTimeTableCell: React.FC<DateTimeCellProps> = ({
   date,
   onDateChange,
   onOpenChange,
@@ -36,11 +36,9 @@ export const DateTimeCell: React.FC<DateTimeCellProps> = ({
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     onOpenChange?.(true);
-    console.log("handleClick invoked");
   };
 
   const handleClose = () => {
-    console.log("handleClose invoked");
     setAnchorEl(null);
     onOpenChange?.(false);
   };
@@ -52,10 +50,13 @@ export const DateTimeCell: React.FC<DateTimeCellProps> = ({
 
   const overdue = isOverdue(date);
   const open = Boolean(anchorEl);
-  console.log({ open });
 
   return (
-    <TableCell>
+    <TableCell
+      sx={{
+        width: "180px",
+      }}
+    >
       <Box
         onClick={handleClick}
         sx={{
@@ -63,6 +64,7 @@ export const DateTimeCell: React.FC<DateTimeCellProps> = ({
           display: "inline-flex",
           alignItems: "center",
           minHeight: "24px",
+
           color: overdue ? "error.main" : "text.secondary",
           "&:hover": {
             opacity: 0.7,
@@ -70,18 +72,27 @@ export const DateTimeCell: React.FC<DateTimeCellProps> = ({
         }}
       >
         {!date ? (
-          <CalendarTodayIcon fontSize="small" sx={{ fontSize: 18 }} />
+          <CalendarTodayIcon
+            role="button"
+            data-id="date-time-cell-icon"
+            fontSize="small"
+            sx={{ fontSize: 18 }}
+            tabIndex={10}
+            aria-label="Open date picker"
+          />
         ) : (
           <Typography variant="body2">{formatDate(date)}</Typography>
         )}
       </Box>
-      <DateTimePicker
-        open={open}
-        anchorEl={anchorEl}
-        initialDate={date}
-        onClose={handleClose}
-        onSave={handleSave}
-      />
+      {open && (
+        <DateTimePicker
+          open={open}
+          anchorEl={anchorEl}
+          initialDate={date}
+          onClose={handleClose}
+          onSave={handleSave}
+        />
+      )}
     </TableCell>
   );
 };
