@@ -15,6 +15,7 @@ const SORT_OPTIONS: { value: SortType; label: string }[] = [
   { value: "createdAt", label: "Created At" },
   { value: "dueDate", label: "Due Date" },
   { value: "order", label: "Manual Order" },
+  
 ];
 
 export const SortMenu: React.FC<SortMenuProps> = ({
@@ -46,8 +47,8 @@ export const SortMenu: React.FC<SortMenuProps> = ({
           paper: {
             sx: {
               minWidth: 152,
-              py: 1,
               bgcolor: "background.paper",
+              borderRadius: 1,
             },
           },
         }}

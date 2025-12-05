@@ -52,7 +52,6 @@ export const AddingRow: React.FC<TodoInputProps> = ({ onSave, onCancel }) => {
 
   const handleBlur = (e: React.FocusEvent) => {
     setTimeout(() => {
-      console.log({ isDatePickerOpen, aa: 22, relatedTarget: e.relatedTarget });
       const relatedTarget = e.relatedTarget as HTMLElement;
       if (relatedTarget?.dataset?.id === "date-time-cell-icon") {
         return;
@@ -61,44 +60,39 @@ export const AddingRow: React.FC<TodoInputProps> = ({ onSave, onCancel }) => {
       if (title.trim()) {
         handleSave(title, dueDate);
       } else {
-        onCancel();
+        // onCancel();
       }
     }, 0);
   };
-  console.log({ isDatePickerOpen });
   return (
     <TableRow hover>
       {/* 1. Checkbox */}
-
       <TableCell
         sx={{
           pt: 0,
           pb: 0,
+          display: "flex",
+          alignItems: "center",
+          gap: 1 / 2,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 / 2 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: 24,
-              height: 24,
-            }}
-          >
-            <Image src="/icons/add.svg" alt="add" width={16} height={16} />
-          </Box>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="輸入後按下Enter進行儲存"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={handleBlur}
-            inputRef={inputRef}
-          />
-        </Box>
+        <Image src="/icons/add.svg" alt="add" width={16} height={16} />
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="輸入後按下Enter進行儲存"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
+          inputRef={inputRef}
+          sx={{
+            height: "46px",
+            "& .MuiOutlinedInput-root": {
+              height: "46px",
+            },
+          }}
+        />
       </TableCell>
 
       {/* 3. Due Date  */}

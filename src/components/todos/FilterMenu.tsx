@@ -12,9 +12,9 @@ interface TodoFilterMenuProps {
 }
 
 const FILTER_OPTIONS: { value: FilterType; label: string }[] = [
-  { value: "all", label: "全部任務" },
   { value: "active", label: "進行中" },
   { value: "completed", label: "已完成" },
+  { value: "all", label: "全部任務" },
 ];
 
 export const FilterMenu: React.FC<TodoFilterMenuProps> = ({
@@ -47,8 +47,8 @@ export const FilterMenu: React.FC<TodoFilterMenuProps> = ({
           paper: {
             sx: {
               minWidth: 152,
-              py: 1,
               bgcolor: "background.paper",
+              borderRadius: 1,
             },
           },
         }}

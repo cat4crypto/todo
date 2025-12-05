@@ -6,7 +6,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { TodoList } from "@/components/todos/TodoList";
 import { Todo } from "@/lib/types";
 import { api, TodoFilter, TodoSort } from "@/lib/api";
-import toast from "react-hot-toast";
 
 export default function Home() {
   const queryClient = useQueryClient();
@@ -51,7 +50,6 @@ export default function Home() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["todos"] });
-      toast.success("Task created successfully");
     },
     onError: (error, _, context) => {
       if (context?.previousTodos) {
@@ -60,7 +58,6 @@ export default function Home() {
           context.previousTodos
         );
       }
-      toast.error(`Failed to create task: ${error.message}`);
     },
   });
 
@@ -84,13 +81,7 @@ export default function Home() {
       return { previousTodos };
     },
     onSuccess: (_, variables) => {
-      if (variables.data.completed !== undefined) {
-        toast.success(
-          variables.data.completed ? "Task completed" : "Task active"
-        );
-      } else {
-        toast.success("Task updated successfully");
-      }
+      
     },
     onError: (err, newTodo, context) => {
       if (context?.previousTodos) {
@@ -99,7 +90,6 @@ export default function Home() {
           context.previousTodos
         );
       }
-      toast.error(`Failed to update task: ${err.message}`);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["todos"] });
@@ -125,7 +115,6 @@ export default function Home() {
       return { previousTodos };
     },
     onSuccess: () => {
-      toast.success("Task deleted successfully");
     },
     onError: (err, id, context) => {
       if (context?.previousTodos) {
@@ -134,7 +123,6 @@ export default function Home() {
           context.previousTodos
         );
       }
-      toast.error(`Failed to delete task: ${err.message}`);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["todos"] });
